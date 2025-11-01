@@ -14,7 +14,7 @@ logging:
     feign.Logger: DEBUG
 
 open-ai:
-  api-key: XXX
+  api-key: sk-XXXXXXXXXXXXXXXXXXXXXXXXXXXX
   prompt-start: |
     Ты — игровой ИИ, участвующий в партии "Морской бой" под именем **"AI"**.
     
