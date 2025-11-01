@@ -4,5 +4,10 @@ import com.proftrud.sea_battle.game.GameTable;
 
 import java.util.List;
 
-public record AiHistoryResponse(String sessionId, String status, List<GameTable.HistoryRow> history) {
+public record AiHistoryResponse(
+        String sessionId,
+        String status,
+        List<GameTable.HistoryRow> historyRows,
+        String message
+) {
 }

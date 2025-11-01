@@ -23,6 +23,11 @@ public class GameTableProvider {
         cache.invalidate(key);
     }
 
+    public GameTable reset(String key) {
+        this.cleanUpCache(key);
+        return cache.get(key, k -> new GameTable());
+    }
+
     public GameTable get(String key) {
         return cache.get(key, k -> new GameTable());
     }

@@ -1,2 +1,5 @@
-/src/main/resources/application-local.yaml
-/src/main/resources/application-prod.yaml
+/src/main/resources/application-*.yaml
+/.idea
+/target
+/mvnw
+/mvnw.cmd

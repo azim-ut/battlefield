@@ -9,6 +9,7 @@ import java.util.List;
 @Slf4j
 @Service
 public class MatrixHelper {
+
     public void printToConsole(BattleField field) {
         int[][] matrix = field.getFieldMatrix();
         System.out.println("---------------" + field.getName() + "---------------");

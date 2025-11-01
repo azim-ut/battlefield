@@ -33,12 +33,47 @@ public class ApiController {
     private final OpenAiChatService openAiChatService;
     private final Gson gson;
 
-    @GetMapping(path = "/table/{uuid}")
+    @GetMapping(path = "/init/{uuid}")
     public ResponseEntity<?> getGateTable(@PathVariable("uuid") String uuid){
+        var gameTable = battleFieldProvider.reset(uuid);
+        int size = 10;
 
-        var gameTable = this.getGameTable(uuid);
+        gameTable.setFieldSize(size)
+                .setName(uuid)
+                .getPlayers().add(
+                        new BattleFieldBuilder()
+                                .setName("Player")
+                                .setHeight(size)
+                                .setWidth(size)
+                                .build()
+                );
+        gameTable.getPlayers().add(
+                new BattleFieldBuilder()
+                        .setName("AI")
+                        .setHeight(size)
+                        .setWidth(size)
+                        .build()
+        );
+        gameTable.getMessages().add(openAiConfig.getPromptStart() + "\n");
+        gameTable.getMessages().add(gson.toJson(gameTable.getDescription("AI")));
 
         openAiChatService.sendMessage(gameTable.getMessages());
+
+        gameTable
+                .clearMessages()
+                .getPlayers()
+                .forEach(matrixHelper::printToConsole);
+
+        return ResponseEntity.ok(gameTable.getState());
+    }
+
+    @PostMapping(path = "/action/{uuid}")
+    public ResponseEntity<?> getGateTable(@RequestBody String target, @PathVariable("uuid") String uuid){
+
+        var gameTable = battleFieldProvider.get(uuid).addHistory("player", "ai", target, -1);
+
+        var replyAi = this.sendHistory(uuid, gameTable);
+        gameTable.applyHistory(replyAi.historyRows());
 
         gameTable.getPlayers().forEach(matrixHelper::printToConsole);
 
@@ -47,51 +82,10 @@ public class ApiController {
 
     private AiHistoryResponse sendHistory(String uuid, GameTable gameTable) {
         var queryToAi = new AiHistoryRequest(uuid, gameTable.getHistory());
-            gameTable.getMessages().add("History json: " + gson.toJson(queryToAi));
+        gameTable.getMessages().add("History json: " + gson.toJson(queryToAi));
         var out = openAiChatService.sendMessage(gameTable.getMessages());
         gameTable.getMessages().clear();
         return out;
-    }
-
-    @PostMapping(path = "/table/{uuid}/action")
-    public ResponseEntity<?> getGateTable(@RequestBody String target, @PathVariable("uuid") String uuid){
-
-        var gameTable = this.getGameTable(uuid).addHistory("player", "ai", target, -1);
-
-        var replyAi = this.sendHistory(uuid, gameTable);
-        gameTable.applyHistory(replyAi.history());
-
-        gameTable.getPlayers().forEach(matrixHelper::printToConsole);
-
-        return ResponseEntity.ok(gameTable.getState());
-    }
-
-    private GameTable getGameTable(String uuid){
-        GameTable table = battleFieldProvider
-                .get(uuid);
-        if(table.getPlayers().isEmpty()){
-            int size = 10;
-
-            table.setFieldSize(size)
-                    .setName(uuid)
-                    .getPlayers().add(
-                            new BattleFieldBuilder()
-                                    .setName("Player")
-                                    .setHeight(size)
-                                    .setWidth(size)
-                                    .build()
-                    );
-            table.getPlayers().add(
-                    new BattleFieldBuilder()
-                            .setName("AI")
-                            .setHeight(size)
-                            .setWidth(size)
-                            .build()
-            );
-            table.getMessages().add(openAiConfig.getPromptStart() + "\n");
-            table.getMessages().add(gson.toJson(table.getDescription("AI")));
-        }
-        return table;
     }
 
 }

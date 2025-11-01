@@ -36,9 +36,13 @@ public class GameTable {
                         .findFirst()
                         .get()
                         .getFieldState()
-                        .stateMap(),
-                history
+                        .stateMap()
         );
+    }
+
+    public GameTable clearMessages(){
+        messages.clear();
+        return this;
     }
 
     public GameTableState getState(){
@@ -57,7 +61,7 @@ public class GameTable {
 
     public void applyHistory(List<HistoryRow> historyRows){
         historyRows.forEach(historyRow -> {
-            var out = new AtomicInteger(0);
+            var out = new AtomicInteger(-100);
             var letter = historyRow.target.substring(0,1);
             int row = Arrays.asList(BattleField.LETTERS).indexOf(letter);
             int column = Integer.parseInt(historyRow.target.substring(1,2));
@@ -67,8 +71,16 @@ public class GameTable {
                     .findFirst()
                     .ifPresent(f -> {
                         out.set(f.getFieldMatrix()[row][column]);
-                        this.addHistory(historyRow.player, historyRow.playerTarget, historyRow.target, out.get());
                     });
+            if(out.get() >= 0){
+                history.set(historyRow.turn, new HistoryRow(
+                        historyRow.turn,
+                        historyRow.player,
+                        historyRow.playerTarget,
+                        historyRow.target,
+                        out.get()
+                ));
+            }
         });
     }
 
@@ -80,8 +92,7 @@ public class GameTable {
     public record GameTableDescription(
             int fieldSize,
             Map<Integer, String> resultsValues,
-            Map<String, Integer[]> aiField,
-            List<HistoryRow> history
+            Map<String, Integer[]> aiField
     ){}
 
     public record FieldState(String name, List<BattleField.State> rows){}
