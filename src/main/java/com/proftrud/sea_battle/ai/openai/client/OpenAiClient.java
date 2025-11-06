@@ -2,7 +2,9 @@ package com.proftrud.sea_battle.ai.openai.client;
 
 import com.proftrud.sea_battle.ai.openai.bean.OpenAi4Request;
 import com.proftrud.sea_battle.ai.openai.bean.OpenAiResponse;
+import com.proftrud.sea_battle.ai.openai.bean.OpenAiResponseOld;
 import com.proftrud.sea_battle.ai.config.FeignCoreConfig;
+import com.proftrud.sea_battle.ai.openai.bean.OpenAiResponseRequest;
 import com.proftrud.sea_battle.ai.openai.config.OpenAiAuthConfig;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,8 +19,15 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface OpenAiClient {
 
     @PostMapping("/chat/completions")
-    OpenAiResponse.Body sendMessage(
+    OpenAiResponseOld.Body sendMessage(
             @RequestHeader(value = "Authorization", required = false) String bearerToken,
             @RequestBody OpenAi4Request.Request request
+    );
+
+
+    @PostMapping(value = "/responses", consumes = "application/json")
+    OpenAiResponse createResponse(
+            @RequestHeader(value = "Authorization", required = false) String bearerToken,
+            @RequestBody OpenAiResponseRequest request
     );
 }

@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Accessors(chain = true)
 public class GameTable {
 
-    private String sessionId;
+    private String Id;
     private String name;
     private int fieldSize = 0;
     private List<HistoryRow> history = new ArrayList<>();
@@ -60,6 +60,9 @@ public class GameTable {
     }
 
     public void applyHistory(List<HistoryRow> historyRows){
+        if(historyRows == null){
+            return;
+        }
         historyRows.forEach(historyRow -> {
             var out = new AtomicInteger(-100);
             var letter = historyRow.target.substring(0,1);
@@ -73,13 +76,18 @@ public class GameTable {
                         out.set(f.getFieldMatrix()[row][column]);
                     });
             if(out.get() >= 0){
-                history.set(historyRow.turn, new HistoryRow(
+                var newRow = new HistoryRow(
                         historyRow.turn,
                         historyRow.player,
                         historyRow.playerTarget,
                         historyRow.target,
                         out.get()
-                ));
+                );
+                if(history.size() >= historyRow.turn){
+                    history.set(historyRow.turn, newRow);
+                }else{
+                    history.add(historyRow.turn, newRow);
+                }
             }
         });
     }

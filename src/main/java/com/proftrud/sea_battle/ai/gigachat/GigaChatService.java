@@ -19,19 +19,13 @@ public class GigaChatService implements ChatService {
     private final GigaChatAuthProvider gigaChatAuthProvider;
     private final Gson gson;
 
-    public AiHistoryResponse sendMessage(List<String> message) {
+    @Override
+    public String initGame(GameTable gameTable, String message) {
+        return "";
+    }
 
-        var request = new GigaChatRequest.Request(
-                "gpt-4o-mini",
-                new GigaChatRequest.ResponseFormat("text"),
-                message
-                        .stream()
-                        .map(m -> new GigaChatRequest.Message("user", m))
-                        .toList()
-        );
-        var gigaChatResponse = gigaChatClient
-                .sendMessage(gigaChatAuthProvider.getBearerToken(), request);
-        var content = gigaChatResponse.toString();
-        return gson.fromJson(content, AiHistoryResponse.class);
+    @Override
+    public String makeTurn(GameTable gameTable, String message) {
+        return "";
     }
 }

@@ -1,9 +1,9 @@
 package com.proftrud.sea_battle.ai;
 
-import com.proftrud.sea_battle.ai.bean.AiHistoryResponse;
-
-import java.util.List;
+import com.proftrud.sea_battle.game.GameTable;
 
 public interface ChatService {
-    AiHistoryResponse sendMessage(List<String> message);
+
+    String initGame(GameTable gameTable, String message);
+    String makeTurn(GameTable gameTable, String message);
 }

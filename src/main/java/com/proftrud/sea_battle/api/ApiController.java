@@ -1,13 +1,10 @@
 package com.proftrud.sea_battle.api;
 
 import com.google.gson.Gson;
-import com.proftrud.sea_battle.ai.bean.AiHistoryRequest;
-import com.proftrud.sea_battle.ai.bean.AiHistoryResponse;
 import com.proftrud.sea_battle.ai.gigachat.GigaChatService;
 import com.proftrud.sea_battle.ai.openai.OpenAiChatService;
 import com.proftrud.sea_battle.ai.openai.config.OpenAiConfig;
 import com.proftrud.sea_battle.game.BattleFieldBuilder;
-import com.proftrud.sea_battle.game.GameTable;
 import com.proftrud.sea_battle.game.GameTableProvider;
 import com.proftrud.sea_battle.game.MatrixHelper;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -54,38 +53,27 @@ public class ApiController {
                         .setWidth(size)
                         .build()
         );
-        gameTable.getMessages().add(openAiConfig.getPromptStart() + "\n");
-        gameTable.getMessages().add(gson.toJson(gameTable.getDescription("AI")));
 
-        openAiChatService.sendMessage(gameTable.getMessages());
+        var answer = openAiChatService.initGame(gameTable,
+                openAiConfig.getPromptStart() +
+                        "\n" +
+                gson.toJson(gameTable.getDescription("AI"))
+        );
 
         gameTable
                 .clearMessages()
                 .getPlayers()
                 .forEach(matrixHelper::printToConsole);
 
-        return ResponseEntity.ok(gameTable.getState());
+        return ResponseEntity.ok(answer);
     }
 
-    @PostMapping(path = "/action/{uuid}")
-    public ResponseEntity<?> getGateTable(@RequestBody String target, @PathVariable("uuid") String uuid){
+    @PostMapping(path = "/turn/{uuid}")
+    public ResponseEntity<?> getGateTable(@RequestBody String action, @PathVariable("uuid") String uuid){
 
-        var gameTable = battleFieldProvider.get(uuid).addHistory("player", "ai", target, -1);
+        var aiAnswer = openAiChatService.makeTurn(battleFieldProvider.get(uuid), action);
 
-        var replyAi = this.sendHistory(uuid, gameTable);
-        gameTable.applyHistory(replyAi.historyRows());
-
-        gameTable.getPlayers().forEach(matrixHelper::printToConsole);
-
-        return ResponseEntity.ok(gameTable.getState());
-    }
-
-    private AiHistoryResponse sendHistory(String uuid, GameTable gameTable) {
-        var queryToAi = new AiHistoryRequest(uuid, gameTable.getHistory());
-        gameTable.getMessages().add("History json: " + gson.toJson(queryToAi));
-        var out = openAiChatService.sendMessage(gameTable.getMessages());
-        gameTable.getMessages().clear();
-        return out;
+        return ResponseEntity.ok(aiAnswer);
     }
 
 }

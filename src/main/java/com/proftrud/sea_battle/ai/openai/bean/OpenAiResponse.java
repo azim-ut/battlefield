@@ -1,15 +1,27 @@
 package com.proftrud.sea_battle.ai.openai.bean;
 
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class OpenAiResponse {
+    private String id;
+    private List<Output> output;
 
-    public record Body(String id, String object, Long created, String model, List<Choice> choices, Usage usage){}
+    @Data
+    public static class Output {
+        private List<Content> content;
+    }
 
-    public record Choice(int index, ChoiceMessage message){}
-
-    public record ChoiceMessage(String role, String content, String finish_reason){}
-
-    public record Usage(int prompt_tokens, int completion_tokens, int total_tokens){}
-
+    @Data
+    public static class Content {
+        private String type;
+        private String text;
+    }
 }
