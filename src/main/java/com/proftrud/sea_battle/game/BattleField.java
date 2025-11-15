@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -24,11 +25,18 @@ public class BattleField {
         fieldMatrix = matrix;
     }
 
+    public int getResult(String coordinates){
+        var letter = coordinates.substring(0, 1).toUpperCase();
+        var col = List.of(LETTERS).indexOf(letter);
+        var row = Integer.parseInt(coordinates.substring(1, coordinates.length()-1));
+        return this.fieldMatrix[row][col];
+    }
+
     public State getFieldState(){
         Map<String, Integer[]> out = new LinkedHashMap<>();
 
-        for(int j = 0; j< fieldMatrix.length; j++){
-            for(int i = 0; i< fieldMatrix.length; i++){
+        for(int j = 0; j < fieldMatrix.length; j++){
+            for(int i = 0; i < fieldMatrix.length; i++){
                 String key = LETTERS[j];
                 if(!out.containsKey(key)){
                     out.put(key, Arrays.stream(fieldMatrix[j])

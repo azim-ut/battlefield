@@ -4,9 +4,12 @@ import com.google.gson.Gson;
 import com.proftrud.sea_battle.ai.gigachat.GigaChatService;
 import com.proftrud.sea_battle.ai.openai.OpenAiChatService;
 import com.proftrud.sea_battle.ai.openai.config.OpenAiConfig;
+import com.proftrud.sea_battle.api.bean.AiResponse;
 import com.proftrud.sea_battle.game.BattleFieldBuilder;
+import com.proftrud.sea_battle.game.GameTable;
 import com.proftrud.sea_battle.game.GameTableProvider;
 import com.proftrud.sea_battle.game.MatrixHelper;
+import com.proftrud.sea_battle.game.constants.Command;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 @RestController
@@ -70,10 +73,30 @@ public class ApiController {
 
     @PostMapping(path = "/turn/{uuid}")
     public ResponseEntity<?> getGateTable(@RequestBody String action, @PathVariable("uuid") String uuid){
+        var table = battleFieldProvider.get(uuid);
+        var aiAnswer = openAiChatService.makeTurn(table, action);
+        return ResponseEntity.ok(new AiResponse(aiAnswer, isCorrect(table, action, aiAnswer)));
+    }
 
-        var aiAnswer = openAiChatService.makeTurn(battleFieldProvider.get(uuid), action);
+    private boolean isCorrect(GameTable table, String action, String answer){
+        var correct = new AtomicBoolean(true);
+        var fieldOptional = table
+                .getPlayers()
+                .stream()
+                .filter(f -> f.getName().equals("AI"))
+                .findFirst();
 
-        return ResponseEntity.ok(aiAnswer);
+        if(action.length()<=3){
+            fieldOptional.ifPresent(field -> {
+                if(Command.isHitOrKillOrWin(action)){
+                    correct.set(field.getResult(action) == 1);
+                }
+                if(Command.isMissOrLoos(action)){
+                    correct.set(field.getResult(action) == 0);
+                }
+            });
+        }
+        return correct.get();
     }
 
 }
