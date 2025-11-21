@@ -66,7 +66,7 @@ public class GameTable {
         historyRows.forEach(historyRow -> {
             var out = new AtomicInteger(-100);
             var letter = historyRow.target.substring(0,1);
-            int row = Arrays.asList(BattleField.LETTERS).indexOf(letter);
+            int row = Arrays.asList(BattleField.COLUMNS).indexOf(letter);
             int column = Integer.parseInt(historyRow.target.substring(1,2));
             this.players
                     .stream()

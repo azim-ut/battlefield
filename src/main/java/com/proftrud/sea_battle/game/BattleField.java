@@ -19,7 +19,7 @@ import java.util.Map;
 public class BattleField {
     private String name;
     private int[][] fieldMatrix = new int[][]{};
-    public static String[] LETTERS = new String[]{"A", "Б", "В", "Г", "Д", "Е", "Ё", "Ж", "З", "И", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "У"};
+    public static String[] COLUMNS = new String[]{"A", "Б", "В", "Г", "Д", "Е", "Ё", "Ж", "З", "И", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "У"};
 
     public BattleField(int[][] matrix){
         fieldMatrix = matrix;
@@ -27,7 +27,7 @@ public class BattleField {
 
     public int getResult(String coordinates){
         var letter = coordinates.substring(0, 1).toUpperCase();
-        var col = List.of(LETTERS).indexOf(letter);
+        var col = List.of(COLUMNS).indexOf(letter);
         var row = Integer.parseInt(coordinates.substring(1, coordinates.length()-1));
         return this.fieldMatrix[row][col];
     }
@@ -37,7 +37,7 @@ public class BattleField {
 
         for(int j = 0; j < fieldMatrix.length; j++){
             for(int i = 0; i < fieldMatrix.length; i++){
-                String key = LETTERS[j];
+                String key = COLUMNS[j];
                 if(!out.containsKey(key)){
                     out.put(key, Arrays.stream(fieldMatrix[j])
                             .boxed()

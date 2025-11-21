@@ -2,6 +2,7 @@ package com.proftrud.sea_battle.ai.openai;
 
 import com.google.gson.Gson;
 import com.proftrud.sea_battle.ai.ChatService;
+import com.proftrud.sea_battle.ai.bean.AiAnswer;
 import com.proftrud.sea_battle.ai.openai.bean.OpenAiResponse;
 import com.proftrud.sea_battle.ai.openai.bean.OpenAiResponseRequest;
 import com.proftrud.sea_battle.ai.openai.client.OpenAiClient;
@@ -35,7 +36,7 @@ public class OpenAiChatService implements ChatService {
         return responseText;
     }
 
-    public String makeTurn(GameTable gameTable, String message) {
+    public AiAnswer makeTurn(GameTable gameTable, String message) {
         log.info("Me: {}", message);
         OpenAiResponse responseBody = openAiClient.createResponse(openAiConfig.getApiKey(), new OpenAiResponseRequest(
                 "gpt-4-turbo",
@@ -46,6 +47,15 @@ public class OpenAiChatService implements ChatService {
         gameTable.setId(responseId);
         String responseText = responseBody.getOutput().getFirst().getContent().getFirst().getText();
         log.info("AI: {}", responseText);
-        return responseText;
+        StringBuilder description = new StringBuilder();
+        String answer = "";
+
+        String[] rows = responseText.split("\\n");
+        for(int i = 0; i< rows.length-2; i++){
+            description.append(rows[i]);
+        }
+        answer = rows[rows.length-1];
+
+        return new AiAnswer(description.toString(), answer);
     }
 }

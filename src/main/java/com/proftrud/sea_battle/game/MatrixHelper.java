@@ -12,8 +12,20 @@ public class MatrixHelper {
 
     public void printToConsole(BattleField field) {
         int[][] matrix = field.getFieldMatrix();
-        System.out.println("---------------" + field.getName() + "---------------");
+
+        System.out.println("-----------------" + field.getName() + "-----------------");
+        System.out.print("  ┌ ");
+        for(int i = 0; i<matrix[0].length; i++){
+            System.out.print(" "+BattleField.COLUMNS[i]+" ");
+        }
+        System.out.println("");
         for(int i = 0; i<matrix.length; i++){
+            var rowNum = i+1;
+            String rowNumStr = String.valueOf(rowNum);
+            if(rowNum<10){
+                rowNumStr = " " + rowNumStr;
+            }
+            System.out.print(" " + rowNumStr + " ");
             for(int j = 0; j<matrix[0].length; j++){
                 String nm = Math.round(matrix[i][j]) + "";
                 if(matrix[i][j]>9){
@@ -26,7 +38,7 @@ public class MatrixHelper {
             }
             System.out.println("");
         }
-        System.out.println("------------------------------");
+        System.out.println("------------------------------------");
     }
 
     public List<Integer> matrixToVector(int[][] matrix){

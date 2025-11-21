@@ -1,6 +1,7 @@
 package com.proftrud.sea_battle.api;
 
 import com.google.gson.Gson;
+import com.proftrud.sea_battle.ai.bean.AiAnswer;
 import com.proftrud.sea_battle.ai.gigachat.GigaChatService;
 import com.proftrud.sea_battle.ai.openai.OpenAiChatService;
 import com.proftrud.sea_battle.ai.openai.config.OpenAiConfig;
@@ -24,12 +25,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 @RestController
-@RequestMapping(path = "/api/v1/sea-battle")
+@RequestMapping(path = "/api/v1/sea-battle/gpt")
 @RequiredArgsConstructor
-public class ApiController {
+public class OpenAiApiController {
 
     private final GameTableProvider battleFieldProvider;
-    private final GigaChatService gigaChatService;
     private final OpenAiConfig openAiConfig;
     private final MatrixHelper matrixHelper;
     private final OpenAiChatService openAiChatService;
@@ -75,10 +75,10 @@ public class ApiController {
     public ResponseEntity<?> getGateTable(@RequestBody String action, @PathVariable("uuid") String uuid){
         var table = battleFieldProvider.get(uuid);
         var aiAnswer = openAiChatService.makeTurn(table, action);
-        return ResponseEntity.ok(new AiResponse(aiAnswer, isCorrect(table, action, aiAnswer)));
+        return ResponseEntity.ok(new AiResponse(aiAnswer.toString(), isCorrect(table, action, aiAnswer)));
     }
 
-    private boolean isCorrect(GameTable table, String action, String answer){
+    private boolean isCorrect(GameTable table, String action, AiAnswer aiAnswer){
         var correct = new AtomicBoolean(true);
         var fieldOptional = table
                 .getPlayers()
@@ -86,6 +86,7 @@ public class ApiController {
                 .filter(f -> f.getName().equals("AI"))
                 .findFirst();
 
+        var answerData = aiAnswer.answer();
         if(action.length()<=3){
             fieldOptional.ifPresent(field -> {
                 if(Command.isHitOrKillOrWin(action)){
@@ -95,6 +96,8 @@ public class ApiController {
                     correct.set(field.getResult(action) == 0);
                 }
             });
+        }else{
+
         }
         return correct.get();
     }
