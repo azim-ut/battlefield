@@ -53,8 +53,21 @@
 
         <dependency>
             <groupId>io.github.openfeign</groupId>
-            <artifactId>feign-jackson</artifactId>
+            <artifactId>feign-gson</artifactId>
             <version>13.6</version>
+        </dependency>
+
+        <!-- FEIGN OKHTTP CLIENT -->
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-okhttp</artifactId>
+        </dependency>
+
+        <!-- OKHTTP -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>4.12.0</version>
         </dependency>
 
         <dependency>

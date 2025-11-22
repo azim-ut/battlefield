@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Slf4j
@@ -39,10 +40,11 @@ public class GigaChatAuthProvider {
     private void refreshToken() {
         String credentials = Base64.getEncoder()
                 .encodeToString((gigaChatConfig.getClientId() + ":" + gigaChatConfig.getClientSecret()).getBytes());
-        String basic = "Basic " + credentials;
+        String basic = "Basic " + gigaChatConfig.getAuthKey();
 
         try {
-            Map<String, Object> response = authClient.getToken(basic, "scope=GIGACHAT_API_PERS");
+            var uuid = UUID.randomUUID().toString();
+            Map<String, Object> response = authClient.getToken(basic, uuid, "scope=GIGACHAT_API_PERS");
             accessToken = (String) response.get("access_token");
             int expiresIn = ((Number) response.getOrDefault("expires_in", 1800)).intValue();
             expiresAt = Instant.now().plusSeconds(expiresIn - 30);

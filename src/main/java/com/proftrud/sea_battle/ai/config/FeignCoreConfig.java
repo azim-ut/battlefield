@@ -3,8 +3,8 @@ package com.proftrud.sea_battle.ai.config;
 import feign.Logger;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
-import feign.jackson.JacksonDecoder;
-import feign.jackson.JacksonEncoder;
+import feign.gson.GsonDecoder;
+import feign.gson.GsonEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,12 +15,12 @@ public class FeignCoreConfig {
 
     @Bean
     public Encoder feignEncoder() {
-        return new JacksonEncoder();
+        return new GsonEncoder();
     }
 
     @Bean
     public Decoder feignDecoder() {
-        return new JacksonDecoder();
+        return new GsonDecoder();
     }
 
     @Bean

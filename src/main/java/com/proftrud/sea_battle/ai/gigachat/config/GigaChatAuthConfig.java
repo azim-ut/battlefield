@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-//@Configuration(value = "gigaChatAuthConfig")
+@Configuration(value = "gigaChatAuthConfig")
 @RequiredArgsConstructor
 public class GigaChatAuthConfig {
 
