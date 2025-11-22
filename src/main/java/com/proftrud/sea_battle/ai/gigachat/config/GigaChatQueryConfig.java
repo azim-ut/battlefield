@@ -1,24 +1,20 @@
 package com.proftrud.sea_battle.ai.gigachat.config;
 
-import com.proftrud.sea_battle.ai.gigachat.GigaChatAuthProvider;
-import feign.Logger;
-import feign.RequestInterceptor;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
-import feign.form.spring.SpringFormEncoder;
 import feign.gson.GsonDecoder;
+import feign.gson.GsonEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-//@Configuration(value = "gigaChatAuthConfig")
+//@Configuration(value = "gigaChatQueryConfig")
 @RequiredArgsConstructor
-public class GigaChatAuthConfig {
-
+public class GigaChatQueryConfig {
 
     @Bean
-    public Encoder formEncoder() {
-        return new SpringFormEncoder();
+    public Encoder feignEncoder() {
+        return new GsonEncoder();
     }
 
     @Bean

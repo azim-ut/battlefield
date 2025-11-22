@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Path;
+
 @Slf4j
 @Service(value = "OpenAiChatService")
 @RequiredArgsConstructor
@@ -57,5 +59,10 @@ public class OpenAiChatService implements ChatService {
         answer = rows[rows.length-1];
 
         return new AiAnswer(description.toString(), answer);
+    }
+
+    @Override
+    public Path generateAvatar(String prompt) {
+        return null;
     }
 }

@@ -2,7 +2,6 @@ package com.proftrud.sea_battle.api;
 
 import com.google.gson.Gson;
 import com.proftrud.sea_battle.ai.bean.AiAnswer;
-import com.proftrud.sea_battle.ai.gigachat.GigaChatService;
 import com.proftrud.sea_battle.ai.openai.OpenAiChatService;
 import com.proftrud.sea_battle.ai.openai.config.OpenAiConfig;
 import com.proftrud.sea_battle.api.bean.AiResponse;
