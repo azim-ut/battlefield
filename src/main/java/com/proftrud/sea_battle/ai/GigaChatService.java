@@ -32,8 +32,7 @@ public class GigaChatService implements ChatService {
         log.info("initGame Me: {}", message);
         var token = gigaChatAuthProvider.getBearerToken();
         GigaChatResponse responseBody = gigaChatClient.sendMessage(token, new GigaChatRequest.Request(
-                "GigaChat",
-                new GigaChatRequest.ResponseFormat("user"),
+                "GigaChat-2",
                 List.of(new GigaChatRequest.Message("user", message))
         ));
         log.info("initGame AI answer: {}", responseBody);
@@ -47,7 +46,6 @@ public class GigaChatService implements ChatService {
         var token = gigaChatAuthProvider.getBearerToken();
         GigaChatResponse responseBody = gigaChatClient.sendMessage(token, new GigaChatRequest.Request(
                 "GigaChat",
-                new GigaChatRequest.ResponseFormat("user"),
                 List.of(new GigaChatRequest.Message("user", message))
         ));
         log.info("makeTurn AI answer: {}", responseBody);

@@ -14,7 +14,6 @@ public class GigaChatRequest {
 
     public record Request(
             String model,
-            ResponseFormat response_format,
             List<Message> messages
     ){}
 

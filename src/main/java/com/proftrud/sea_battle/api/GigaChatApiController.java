@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import com.proftrud.sea_battle.ai.GigaChatService;
 import com.proftrud.sea_battle.ai.bean.AiAnswer;
 import com.proftrud.sea_battle.ai.gigachat.config.GigaChatConfig;
-import com.proftrud.sea_battle.ai.openai.OpenAiChatService;
-import com.proftrud.sea_battle.ai.openai.config.OpenAiConfig;
 import com.proftrud.sea_battle.api.bean.AiResponse;
 import com.proftrud.sea_battle.game.BattleFieldBuilder;
 import com.proftrud.sea_battle.game.GameTable;
