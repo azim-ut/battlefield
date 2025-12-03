@@ -2,6 +2,7 @@ package com.proftrud.sea_battle.ai;
 
 import com.proftrud.sea_battle.ai.bean.AiAnswer;
 import com.proftrud.sea_battle.ai.gigachat.GigaChatAuthProvider;
+import com.proftrud.sea_battle.ai.gigachat.bean.GigaChatCompletionResponse;
 import com.proftrud.sea_battle.ai.gigachat.bean.GigaChatImageRequest;
 import com.proftrud.sea_battle.ai.gigachat.bean.GigaChatImageResponse;
 import com.proftrud.sea_battle.ai.gigachat.bean.GigaChatRequest;
@@ -31,7 +32,7 @@ public class GigaChatService implements ChatService {
 
         log.info("initGame Me: {}", message);
         var token = gigaChatAuthProvider.getBearerToken();
-        GigaChatResponse responseBody = gigaChatClient.sendMessage(token, new GigaChatRequest.Request(
+        GigaChatCompletionResponse responseBody = gigaChatClient.sendMessage(token, new GigaChatRequest.Request(
                 "GigaChat-2",
                 List.of(new GigaChatRequest.Message("user", message))
         ));
@@ -44,7 +45,7 @@ public class GigaChatService implements ChatService {
 
         log.info("makeTurn: {}", message);
         var token = gigaChatAuthProvider.getBearerToken();
-        GigaChatResponse responseBody = gigaChatClient.sendMessage(token, new GigaChatRequest.Request(
+        GigaChatCompletionResponse responseBody = gigaChatClient.sendMessage(token, new GigaChatRequest.Request(
                 "GigaChat",
                 List.of(new GigaChatRequest.Message("user", message))
         ));

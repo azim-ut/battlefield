@@ -1,6 +1,7 @@
 package com.proftrud.sea_battle.ai.gigachat.client;
 
 
+import com.proftrud.sea_battle.ai.gigachat.bean.GigaChatCompletionResponse;
 import com.proftrud.sea_battle.ai.gigachat.bean.GigaChatImageRequest;
 import com.proftrud.sea_battle.ai.gigachat.bean.GigaChatImageResponse;
 import com.proftrud.sea_battle.ai.gigachat.bean.GigaChatRequest;
@@ -33,7 +34,7 @@ public interface GigaChatClient {
     );
 
     @PostMapping("/chat/completions")
-    GigaChatResponse sendMessage(
+    GigaChatCompletionResponse sendMessage(
             @RequestHeader(value = "Authorization", required = false) String bearerToken,
             @RequestBody GigaChatRequest.Request request
     );
