@@ -6,7 +6,6 @@ import com.proftrud.sea_battle.ai.gigachat.bean.GigaChatCompletionResponse;
 import com.proftrud.sea_battle.ai.gigachat.bean.GigaChatImageRequest;
 import com.proftrud.sea_battle.ai.gigachat.bean.GigaChatImageResponse;
 import com.proftrud.sea_battle.ai.gigachat.bean.GigaChatRequest;
-import com.proftrud.sea_battle.ai.gigachat.bean.GigaChatResponse;
 import com.proftrud.sea_battle.ai.gigachat.client.GigaChatClient;
 import com.proftrud.sea_battle.game.GameTable;
 import lombok.RequiredArgsConstructor;

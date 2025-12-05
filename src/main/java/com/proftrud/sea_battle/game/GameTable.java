@@ -45,6 +45,10 @@ public class GameTable {
         return this;
     }
 
+    public boolean isActive(){
+        return !history.isEmpty();
+    }
+
     public GameTableState getState(){
         Map<String, BattleField> fields = new LinkedHashMap<>();
         players.forEach(row -> fields.put(row.getName(), row));

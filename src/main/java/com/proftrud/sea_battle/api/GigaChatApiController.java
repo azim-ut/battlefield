@@ -3,8 +3,8 @@ package com.proftrud.sea_battle.api;
 import com.google.gson.Gson;
 import com.proftrud.sea_battle.ai.GigaChatService;
 import com.proftrud.sea_battle.ai.bean.AiAnswer;
-import com.proftrud.sea_battle.ai.gigachat.config.GigaChatConfig;
 import com.proftrud.sea_battle.api.bean.AiResponse;
+import com.proftrud.sea_battle.api.bean.GameInitRequest;
 import com.proftrud.sea_battle.game.BattleFieldBuilder;
 import com.proftrud.sea_battle.game.GameTable;
 import com.proftrud.sea_battle.game.GameTableProvider;
@@ -30,13 +30,23 @@ public class GigaChatApiController {
 
     private final GameTableProvider battleFieldProvider;
     private final GigaChatService gigaChatService;
-    private final GigaChatConfig gigaChatConfig;
     private final MatrixHelper matrixHelper;
     private final Gson gson;
 
-    @GetMapping(path = "/init/{uuid}")
-    public ResponseEntity<?> getGateTable(@PathVariable("uuid") String uuid){
+    @GetMapping(path = "/check/{uuid}")
+    public ResponseEntity<?> checkGateTable(@PathVariable("uuid") String uuid){
+        return ResponseEntity.ok(battleFieldProvider.get(uuid));
+    }
+
+    @GetMapping(path = "/reset/{uuid}")
+    public ResponseEntity<?> resetGateTable(@PathVariable("uuid") String uuid){
         var gameTable = battleFieldProvider.reset(uuid);
+        return ResponseEntity.ok(gameTable);
+    }
+
+    @PostMapping(path = "init/{uuid}")
+    public ResponseEntity<?> initGateTable(@PathVariable("uuid") String uuid, @RequestBody GameInitRequest prompt){
+        var gameTable = battleFieldProvider.get(uuid);
         int size = 10;
 
         gameTable.setFieldSize(size)
@@ -57,8 +67,7 @@ public class GigaChatApiController {
         );
 
         var answer = gigaChatService.initGame(gameTable,
-                gigaChatConfig.getPromptStart() +
-                        "\n" +
+                prompt + "\n" +
                 gson.toJson(gameTable.getDescription("AI"))
         );
 
