@@ -9,11 +9,11 @@ public record GigaChatCompletionResponse(
         String object
 ) {
     public record Choice(
-            Delta delta,
+            Message message,
             int index
     ) {}
 
-    public record Delta(
+    public record Message(
             String content,
             String role
     ) {}
