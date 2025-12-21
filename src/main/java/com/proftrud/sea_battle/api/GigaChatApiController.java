@@ -2,7 +2,6 @@ package com.proftrud.sea_battle.api;
 
 import com.google.gson.Gson;
 import com.proftrud.sea_battle.ai.GigaChatService;
-import com.proftrud.sea_battle.ai.bean.AiAnswer;
 import com.proftrud.sea_battle.api.bean.AiResponse;
 import com.proftrud.sea_battle.api.bean.GameInitRequest;
 import com.proftrud.sea_battle.game.BattleFieldBuilder;
@@ -35,7 +34,10 @@ public class GigaChatApiController {
 
     @GetMapping(path = "/check/{uuid}")
     public ResponseEntity<?> checkGateTable(@PathVariable("uuid") String uuid){
-        return ResponseEntity.ok(battleFieldProvider.get(uuid));
+        var table = battleFieldProvider.get(uuid);
+        var answer = gigaChatService.RawAnswer(table, "SCAN. Ты уже играешь с " + uuid + "? Ответь - YES если да и NO если нет");
+
+        return ResponseEntity.ok(answer.equals("YES"));
     }
 
     @GetMapping(path = "/reset/{uuid}")
@@ -51,6 +53,7 @@ public class GigaChatApiController {
 
         gameTable.setFieldSize(size)
                 .setName(uuid)
+                .setActive(true)
                 .getPlayers().add(
                         new BattleFieldBuilder()
                                 .setName("Player")
@@ -83,17 +86,24 @@ public class GigaChatApiController {
     public ResponseEntity<?> getGateTable(@RequestBody String action, @PathVariable("uuid") String uuid){
         var table = battleFieldProvider.get(uuid);
         var aiAnswer = gigaChatService.makeTurn(table, action);
-        return ResponseEntity.ok(new AiResponse(aiAnswer.toString(), isCorrect(table, action, aiAnswer)));
+
+        return ResponseEntity.ok(new AiResponse(
+                table.isActive(),
+                isCorrect(table, action, aiAnswer),
+                aiAnswer.avatar(),
+                aiAnswer.message(),
+                aiAnswer.move()
+        ));
     }
 
-    private boolean isCorrect(GameTable table, String action, AiAnswer aiAnswer){
+    private boolean isCorrect(GameTable table, String action, AiResponse aiAnswer){
         var correct = new AtomicBoolean(true);
         var fieldOptional = table
                 .getPlayers()
                 .stream()
                 .filter(f -> f.getName().equals("AI"))
                 .findFirst();
-        var answerData = aiAnswer.answer();
+        var answerData = aiAnswer.move();
         if(action.length() <= 3){
             fieldOptional.ifPresent(field -> {
                 if(Command.isHitOrKillOrWin(answerData)){

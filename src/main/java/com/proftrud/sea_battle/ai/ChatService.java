@@ -1,13 +1,14 @@
 package com.proftrud.sea_battle.ai;
 
-import com.proftrud.sea_battle.ai.bean.AiAnswer;
+import com.proftrud.sea_battle.api.bean.AiResponse;
 import com.proftrud.sea_battle.game.GameTable;
 
 import java.nio.file.Path;
 
 public interface ChatService {
 
-    String initGame(GameTable gameTable, String message);
-    AiAnswer makeTurn(GameTable gameTable, String message);
+    AiResponse initGame(GameTable gameTable, String message);
+    AiResponse makeTurn(GameTable gameTable, String message);
+    String RawAnswer(GameTable gameTable, String prompt);
     Path generateAvatar(String prompt);
 }

@@ -1,12 +1,12 @@
 package com.proftrud.sea_battle.ai;
 
-import com.proftrud.sea_battle.ai.bean.AiAnswer;
 import com.proftrud.sea_battle.ai.gigachat.GigaChatAuthProvider;
 import com.proftrud.sea_battle.ai.gigachat.bean.GigaChatCompletionResponse;
 import com.proftrud.sea_battle.ai.gigachat.bean.GigaChatImageRequest;
 import com.proftrud.sea_battle.ai.gigachat.bean.GigaChatImageResponse;
 import com.proftrud.sea_battle.ai.gigachat.bean.GigaChatRequest;
 import com.proftrud.sea_battle.ai.gigachat.client.GigaChatClient;
+import com.proftrud.sea_battle.api.bean.AiResponse;
 import com.proftrud.sea_battle.game.GameTable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Base64;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 @Service(value = "GigaChatService")
@@ -27,29 +28,59 @@ public class GigaChatService implements ChatService {
     private final GigaChatAuthProvider gigaChatAuthProvider;
 
     @Override
-    public String initGame(GameTable gameTable, String message) {
+    public AiResponse initGame(GameTable gameTable, String message) {
 
         log.info("initGame Me: {}", message);
         var token = gigaChatAuthProvider.getBearerToken();
-        GigaChatCompletionResponse responseBody = gigaChatClient.sendMessage(token, new GigaChatRequest.Request(
+        GigaChatCompletionResponse aiResponse = gigaChatClient.sendMessage(token, new GigaChatRequest.Request(
                 "GigaChat-2",
                 List.of(new GigaChatRequest.Message("user", message))
         ));
-        log.info("initGame AI answer: {}", responseBody);
-        return responseBody.toString();
+        log.info("initGame AI answer: {}", aiResponse);
+
+        return answerToResponse(gameTable, aiResponse);
+    }
+
+    private AiResponse answerToResponse(GameTable gameTable, GigaChatCompletionResponse  gigaChatCompletionResponse) {
+        if(gigaChatCompletionResponse.choices().isEmpty()){
+            return new AiResponse(gameTable.isActive(), false, "", "", "");
+        }
+        AtomicReference<String> txt = new AtomicReference<>();
+        gigaChatCompletionResponse.choices().forEach(choice -> txt.set(choice.message().content()));
+        var txtParts = txt.get().split("\\n");
+        var faceType = txtParts[0].trim();
+        var phrase = txtParts[1].trim();
+        var move = txtParts[2].trim();
+        return new AiResponse(gameTable.isActive(), true, faceType, phrase, move);
     }
 
     @Override
-    public AiAnswer makeTurn(GameTable gameTable, String message) {
+    public AiResponse makeTurn(GameTable gameTable, String message) {
 
         log.info("makeTurn: {}", message);
         var token = gigaChatAuthProvider.getBearerToken();
-        GigaChatCompletionResponse responseBody = gigaChatClient.sendMessage(token, new GigaChatRequest.Request(
+        GigaChatCompletionResponse aiResponse = gigaChatClient.sendMessage(token, new GigaChatRequest.Request(
                 "GigaChat",
                 List.of(new GigaChatRequest.Message("user", message))
         ));
-        log.info("makeTurn AI answer: {}", responseBody);
-        return new AiAnswer("", responseBody.toString());
+        log.info("makeTurn AI answer: {}", aiResponse);
+        return answerToResponse(gameTable, aiResponse);
+    }
+
+    @Override
+    public String RawAnswer(GameTable gameTable, String prompt) {
+
+        log.info("RawAnswer: {}", prompt);
+        var token = gigaChatAuthProvider.getBearerToken();
+        GigaChatCompletionResponse aiResponse = gigaChatClient.sendMessage(token, new GigaChatRequest.Request(
+                "GigaChat",
+                List.of(new GigaChatRequest.Message("user", prompt))
+        ));
+        log.info("RawAnswer AI answer: {}", aiResponse);
+        AtomicReference<String> txt = new AtomicReference<>();
+        aiResponse.choices().forEach(choice -> txt.set(choice.message().content()));
+
+        return txt.get();
     }
 
     @Override

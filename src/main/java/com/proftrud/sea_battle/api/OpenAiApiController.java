@@ -1,7 +1,6 @@
 package com.proftrud.sea_battle.api;
 
 import com.google.gson.Gson;
-import com.proftrud.sea_battle.ai.bean.AiAnswer;
 import com.proftrud.sea_battle.ai.openai.OpenAiChatService;
 import com.proftrud.sea_battle.ai.openai.config.OpenAiConfig;
 import com.proftrud.sea_battle.api.bean.AiResponse;
@@ -74,10 +73,16 @@ public class OpenAiApiController {
     public ResponseEntity<?> getGateTable(@RequestBody String action, @PathVariable("uuid") String uuid){
         var table = battleFieldProvider.get(uuid);
         var aiAnswer = openAiChatService.makeTurn(table, action);
-        return ResponseEntity.ok(new AiResponse(aiAnswer.toString(), isCorrect(table, action, aiAnswer)));
+        return ResponseEntity.ok(new AiResponse(
+                table.isActive(),
+                isCorrect(table, action, aiAnswer),
+                "",
+                "",
+                aiAnswer.toString()
+        ));
     }
 
-    private boolean isCorrect(GameTable table, String action, AiAnswer aiAnswer){
+    private boolean isCorrect(GameTable table, String action, AiResponse aiAnswer){
         var correct = new AtomicBoolean(true);
         var fieldOptional = table
                 .getPlayers()
@@ -85,19 +90,7 @@ public class OpenAiApiController {
                 .filter(f -> f.getName().equals("AI"))
                 .findFirst();
 
-        var answerData = aiAnswer.answer();
-        if(action.length()<=3){
-            fieldOptional.ifPresent(field -> {
-                if(Command.isHitOrKillOrWin(action)){
-                    correct.set(field.getResult(action) == 1);
-                }
-                if(Command.isMissOrLoos(action)){
-                    correct.set(field.getResult(action) == 0);
-                }
-            });
-        }else{
 
-        }
         return correct.get();
     }
 

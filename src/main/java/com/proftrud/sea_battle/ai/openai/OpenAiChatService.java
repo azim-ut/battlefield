@@ -2,11 +2,11 @@ package com.proftrud.sea_battle.ai.openai;
 
 import com.google.gson.Gson;
 import com.proftrud.sea_battle.ai.ChatService;
-import com.proftrud.sea_battle.ai.bean.AiAnswer;
 import com.proftrud.sea_battle.ai.openai.bean.OpenAiResponse;
 import com.proftrud.sea_battle.ai.openai.bean.OpenAiResponseRequest;
 import com.proftrud.sea_battle.ai.openai.client.OpenAiClient;
 import com.proftrud.sea_battle.ai.openai.config.OpenAiConfig;
+import com.proftrud.sea_battle.api.bean.AiResponse;
 import com.proftrud.sea_battle.game.GameTable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ public class OpenAiChatService implements ChatService {
     private final OpenAiConfig openAiConfig;
     private final Gson gson;
 
-    public String initGame(GameTable gameTable, String message) {
+    public AiResponse initGame(GameTable gameTable, String message) {
 
         log.info("Me: {}", message);
         OpenAiResponse responseBody = openAiClient.createResponse(openAiConfig.getApiKey(), new OpenAiResponseRequest(
@@ -35,10 +35,10 @@ public class OpenAiChatService implements ChatService {
         gameTable.setId(responseId);
         String responseText = responseBody.getOutput().getFirst().getContent().getFirst().getText();
         log.info("AI: {}", responseText);
-        return responseText;
+        return new AiResponse(gameTable.isActive(), false, "", "", "");
     }
 
-    public AiAnswer makeTurn(GameTable gameTable, String message) {
+    public AiResponse makeTurn(GameTable gameTable, String message) {
         log.info("Me: {}", message);
         OpenAiResponse responseBody = openAiClient.createResponse(openAiConfig.getApiKey(), new OpenAiResponseRequest(
                 "gpt-4-turbo",
@@ -58,8 +58,14 @@ public class OpenAiChatService implements ChatService {
         }
         answer = rows[rows.length-1];
 
-        return new AiAnswer(description.toString(), answer);
+        return new AiResponse(gameTable.isActive(), true, "", description.toString(), answer);
     }
+
+    @Override
+    public String RawAnswer(GameTable gameTable, String prompt) {
+        return "";
+    }
+
 
     @Override
     public Path generateAvatar(String prompt) {

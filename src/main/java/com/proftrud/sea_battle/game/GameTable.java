@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class GameTable {
 
     private String Id;
+    private boolean active;
     private String name;
     private int fieldSize = 0;
     private List<HistoryRow> history = new ArrayList<>();
@@ -43,10 +44,6 @@ public class GameTable {
     public GameTable clearMessages(){
         messages.clear();
         return this;
-    }
-
-    public boolean isActive(){
-        return !history.isEmpty();
     }
 
     public GameTableState getState(){
